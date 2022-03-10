@@ -1,0 +1,49 @@
+name: Text & Publish
+
+on:
+  pull_request:
+    branches:
+      - master
+  release:
+    types: [published]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test
+
+    steps:
+      - uses: actions/checkout@master
+      - run: npm i
+      - run: npm test
+
+  publish:
+    runs-on: ubuntu-latest
+    name: Publish
+
+    needs: [test]
+
+    if: ${{ github.event.name == 'release' }}
+
+    steps:
+      - uses: actions/checkout@master
+      - run: npm i -g @cloudflare/wrangler
+      - run: npm i
+      - run: npm run build
+
+      - run: wrangler publish -c ./wrangler.toml
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+
+      - name: Log to LogSnag
+        uses: jsmrcaga/action-logsnag@v0.0.2
+        with:
+          token: ${{ secrets.LOGSNAG_TOKEN }}
+          project: urls
+          channel: publish
+          event: Published a new version (${{ github.run_number }})!
+          description: Published a new version to workers
+          icon: 🌍
+          notify: true
