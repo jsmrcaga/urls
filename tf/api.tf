@@ -22,3 +22,15 @@ resource cloudflare_worker_route "url_shortener_routes" {
   pattern = "l.jocolina.com/*"
   script_name = cloudflare_worker_script.url_shortener.name
 }
+
+
+# DNS record
+resource cloudflare_record "l_jocolina" {
+  zone_id = var.cloudflare.zone_id
+
+  name = "l"
+  type = "CNAME"
+  value = "@"
+
+  proxied = true
+}
