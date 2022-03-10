@@ -1,0 +1,13 @@
+node_modules/
+
+*/*.tfvars
+*/*.tfplan
+*/.terraform
+*/*.tfstate*
+
+dist/
+index.js
+
+
+
+

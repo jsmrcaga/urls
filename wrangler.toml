@@ -1,0 +1,8 @@
+compatibility_date = "2022-02-26"
+
+name = "urls"
+type = "javascript"
+
+workers_dev = false
+
+routes = ["l.jocolina.com/*"]
