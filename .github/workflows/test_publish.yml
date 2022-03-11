@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-      - run: npm i -g @cloudflare/wrangler
+      - run: npm i -g @cloudflare/wrangler@beta
       - run: npm i
       - run: npm run build
 

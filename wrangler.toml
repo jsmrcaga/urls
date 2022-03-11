@@ -6,3 +6,9 @@ type = "javascript"
 workers_dev = false
 
 routes = ["l.jocolina.com/*"]
+
+main = "./index.js"
+
+[[kv_namespaces]]
+binding = "DATABASE"
+id = "f6428b8357dd4918b3b0faa1eb48052c"
