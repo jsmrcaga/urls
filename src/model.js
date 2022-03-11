@@ -22,7 +22,7 @@ class Tracker {
 	}
 
 	save() {
-		return DATABASE.put(this.tag, JSON.stringify(this)).then(() => this);
+		return DATABASE.put(this.get_id(), JSON.stringify(this)).then(() => this);
 	}
 }
 
