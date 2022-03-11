@@ -13,7 +13,7 @@ app.error((error) => {
 			project: 'urls',
 			channel: 'errors',
 			event: error.message || 'Unknown error',
-			description: error.stack
+			description: error.stack,
 			notify: true,
 		}),
 		headers: {
