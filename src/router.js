@@ -70,11 +70,12 @@ router.get('/pixel/:tag/stats', auth((request, { tag }) => {
 router.post('/pixel/:tag', (request, { tag }) => {
 	// Creates a named pixel, to simplify tracking
 	return request.json().then(body => {
+		const { url, ...rest } = body;
 		if(!url) {
 			return Response('url is needed', { status: 400 });
 		}
 
-		const pixel = new Pixel({ tag, ...body });
+		const pixel = new Pixel({ tag, url, ...rest });
 		return pixel.save();
 	}).then(() => {
 		return new Response(null, { status: 201 });
