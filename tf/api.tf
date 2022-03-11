@@ -30,7 +30,8 @@ resource cloudflare_record "l_jocolina" {
 
   name = "l"
   type = "CNAME"
-  value = "@"
+  # was "@" but cloudflare translates to top level domain
+  value = "jocolina.com"
 
   proxied = true
 }
