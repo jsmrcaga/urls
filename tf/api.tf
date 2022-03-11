@@ -11,6 +11,11 @@ resource cloudflare_worker_script "url_shortener" {
     name = "AUTH_TOKEN"
     text = var.worker_auth_token
   }
+
+  secret_text_binding {
+    name = "LOGSNAG_TOKEN"
+    text = var.logsnag_token
+  }
 }
 
 resource cloudflare_workers_kv_namespace "url_database" {

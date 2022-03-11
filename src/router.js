@@ -28,7 +28,7 @@ router.get('/:tag', (request, { tag }) => {
 
 		const short_url = new ShortUrl(JSON.parse(short));
 
-		short_url.visited(request.headers);
+		short_url.visited(Object.fromEntries(request.headers.entries()));
 		return short_url.save();
 
 	}).then(short_url => {
