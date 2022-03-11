@@ -117,7 +117,7 @@ describe('Routing', () => {
 				expect(stub.calledOnce).to.be.true;
 				const { firstCall } = stub;
 				// Sinon returns true for first arg even if there are others
-				expect(firstCall.calledWith('custom_tag')).to.be.true;
+				expect(firstCall.calledWith('url-custom_tag')).to.be.true;
 
 				expect(response.status).to.be.eql(201);
 				expect(stub.calledOnce).to.be.true;
