@@ -6,12 +6,20 @@ class Tracker {
 		this.notify = notify;
 	}
 
-	visited(headers) {
-		this.visits.push(headers);
+	static get_id(id) {
+		const prefix = this.prefix;
+		return `${prefix}-${id}`;
 	}
 
-	get_id() {
-		return this.tag;
+	static get(id) {
+		return DATABASE.get(this.get_id(id)).then(data => {
+			if(data === null) {
+				return null;
+			}
+
+			const model_data = JSON.parse(data);
+			return new this(model_data);
+		});
 	}
 
 	toJSON() {
@@ -21,20 +29,23 @@ class Tracker {
 		};
 	}
 
+	visited(headers) {
+		this.visits.push(headers);
+	}
+
 	save() {
-		return DATABASE.put(this.get_id(), JSON.stringify(this)).then(() => this);
+		return DATABASE.put(this.constructor.get_id(this.tag), JSON.stringify(this)).then(() => this);
 	}
 }
 
 class ShortUrl extends Tracker {
+	static prefix = 'url';
+
 	constructor({ url, ...rest }) {
 		super(rest);
 		this.url = url;
 	}
 
-	get_id() {
-		return `url-${this.tag}`;
-	}
 
 	toJSON() {
 		return {
@@ -45,9 +56,7 @@ class ShortUrl extends Tracker {
 }
 
 class Pixel extends Tracker {
-	get_id() {
-		return `pixel-${this.tag}`;
-	}
+	static prefix = 'pixel';
 }
 
 module.exports = { ShortUrl, Pixel };

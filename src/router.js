@@ -20,13 +20,11 @@ router.post('/:tag', auth((request, { tag }) => {
 
 router.get('/:tag', (request, { tag }) => {
 	// Get short url
-	return DATABASE.get(`url-${tag}`).then(short => {
-		if(short === null) {
+	return ShortUrl.get(tag).then(short_url => {
+		if(short_url === null) {
 			// Short tag does not exist, so we simulate the response
 			return new Response(null, { status: 404 });
 		}
-
-		const short_url = new ShortUrl(JSON.parse(short));
 
 		short_url.visited(Object.fromEntries(request.headers.entries()));
 		return short_url.save();
@@ -47,7 +45,7 @@ router.get('/:tag', (request, { tag }) => {
 
 router.get('/:tag/stats', auth((request, { tag }) => {
 	// get stats for given url
-	return DATABASE.get(`url-${tag}`).then(short => {
+	return ShortUrl.get(tag).then(short => {
 		// Router will automatically stringify
 		return {
 			...short,
@@ -58,7 +56,7 @@ router.get('/:tag/stats', auth((request, { tag }) => {
 
 router.get('/pixel/:tag/stats', auth((request, { tag }) => {
 	// get stats for given url
-	return DATABASE.get(`pixel-${tag}`).then(pixel => {
+	return Pixel.get(tag).then(pixel => {
 		// Router will automatically stringify
 		return {
 			...pixel,
