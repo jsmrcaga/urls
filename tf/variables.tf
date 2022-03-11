@@ -17,3 +17,7 @@ variable github {
 variable worker_auth_token {
   type = string
 }
+
+variable logsnag_token {
+  type = string
+}
