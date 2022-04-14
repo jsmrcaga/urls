@@ -60,28 +60,46 @@ router.get('/pixel/:tag/stats', auth((request, { tag }) => {
 		// Router will automatically stringify
 		return {
 			...pixel,
-			visit_count: short.visits.length
+			visit_count: pixel.visits.length
 		};
 	});
 }));
 
-router.post('/pixel/:tag', (request, { tag }) => {
+router.post('/pixel/:tag', auth((request, { tag }) => {
 	// Creates a named pixel, to simplify tracking
 	return request.json().then(body => {
-		const { url, ...rest } = body;
-		if(!url) {
-			return Response('url is needed', { status: 400 });
-		}
-
-		const pixel = new Pixel({ tag, url, ...rest });
+		const pixel = new Pixel({ tag, ...body });
 		return pixel.save();
 	}).then(() => {
 		return new Response(null, { status: 201 });
 	});
-});
+}));
 
-router.get('/p/:tag/p.gif', (request, { tag }) => {
-	// Tracking for pixel
+router.get('/:tag/p.gif', (request, { tag }) => {
+	const headers = Object.fromEntries(request.headers.entries());
+
+	return Pixel.get(tag).then(pixel => {
+		if(pixel === null) {
+			// Pixels can auto create
+			const pixel = new Pixel({ tag, visits: [headers] });
+			return pixel.save();
+		}
+
+		pixel.visited(headers);
+		return pixel.save();
+
+	}).then(response => {
+		// Tracking for pixel
+		const pixel_str = atob('R0lGODlhAQABAJAAAP8AAAAAACH5BAUQAAAALAAAAAABAAEAAAICBAEAOw==');
+		const encoder = new TextEncoder();
+		const pixel_bytes = encoder.encode(pixel_str);
+
+		return Response(pixel_bytes, {
+			headers: {
+				'Content-Type': 'image/gif'
+			}
+		});
+	});
 });
 
 module.exports = router;
