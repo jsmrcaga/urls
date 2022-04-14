@@ -94,7 +94,7 @@ router.get('/:tag/p.gif', (request, { tag }) => {
 		const encoder = new TextEncoder();
 		const pixel_bytes = encoder.encode(pixel_str);
 
-		return Response(pixel_bytes, {
+		return new Response(pixel_bytes, {
 			headers: {
 				'Content-Type': 'image/gif'
 			}
