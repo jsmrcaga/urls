@@ -43,6 +43,23 @@ router.get('/:tag', (request, { tag }) => {
 	});
 });
 
+router.get('/:tag/qr.png', (request, { tag }) => {
+	return ShortUrl.get(tag).then(short_url => {
+		if(short_url === null) {
+			// Short tag does not exist, so we simulate the response
+			return new Response(null, { status: 404 });
+		}
+
+		const qr_url = `http://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(short_url.url)}&size=256x256&qzone=2&format=png`
+		return new Response(null, {
+			status: 302,
+			headers: {
+				Location: qr_url
+			}
+		});
+	});
+});
+
 router.get('/:tag/stats', auth((request, { tag }) => {
 	// get stats for given url
 	return ShortUrl.get(tag).then(short => {
