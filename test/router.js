@@ -4,8 +4,14 @@ const { expect } = require('chai');
 const { ShortUrl } = require('../src/model');
 
 const router = require('../src/router');
+const logsnag = require('../src/logsnag');
 
 describe('Routing', () => {
+
+	before(() => {
+		Sinon.stub(logsnag, 'insight').callsFake(() => Promise.resolve());
+	});
+
 	describe('Short URL retrieval', () => {
 		it('Gets a short URL', done => {
 			const stub = Sinon.stub(global.DATABASE, 'get').callsFake(() => {
@@ -36,6 +42,7 @@ describe('Routing', () => {
 				expect(save_stub.calledOnce).to.be.true;
 			}).catch(e => {
 				done(e);
+
 			}).finally(() => {
 				stub.restore();
 				visited_stub.restore();

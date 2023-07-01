@@ -2,6 +2,8 @@ const { ShortUrl, Pixel } = require('./model');
 const auth = require('./auth');
 const { Router } = require('@control/cloudflare-workers-router');
 
+const logsnag = require('./logsnag');
+
 const router = new Router();
 
 router.post('/:tag', auth((request, { tag }) => {
@@ -20,7 +22,12 @@ router.post('/:tag', auth((request, { tag }) => {
 
 router.get('/:tag', (request, { tag }) => {
 	// Get short url
+	const start = Date.now();
+	let get_duration;
+	let total_duration;
 	return ShortUrl.get(tag).then(short_url => {
+		get_duration = Date.now() - start;
+
 		if(short_url === null) {
 			// Short tag does not exist, so we simulate the response
 			return new Response(null, { status: 404 });
@@ -30,6 +37,27 @@ router.get('/:tag', (request, { tag }) => {
 		return short_url.save();
 
 	}).then(short_url => {
+		total_duration = Date.now() - start;
+
+		// Requests _might not_ leave if for some reason
+		// worker is killed before they are launched
+
+		// 20% of requests
+		const should_report = Math.random() < 0.2;
+		if(should_report) {
+			logsnag.insight({
+				title: 'URL Get duration',
+				value: get_duration,
+				icon: get_duration < 1000 ? '🏎️' : '🐢'
+			});
+
+			logsnag.insight({
+				title: 'URL Get + Save duration',
+				value: total_duration,
+				icon: total_duration < 1000 ? '🏎️' : '🐢'
+			});
+		}
+
 		if(short_url instanceof Response) {
 			return short_url;
 		}
