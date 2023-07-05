@@ -13,8 +13,19 @@ resource cloudflare_worker_script "url_shortener" {
   }
 
   secret_text_binding {
-    name = "LOGSNAG_TOKEN"
-    text = var.logsnag_token
+    name = "PING_USERNAME"
+    text = var.ping_username
+  }
+
+  secret_text_binding {
+    name = "PING_PASSWORD"
+    text = var.ping_password
+  }
+
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
   }
 }
 

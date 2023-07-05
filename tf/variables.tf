@@ -18,6 +18,10 @@ variable worker_auth_token {
   type = string
 }
 
-variable logsnag_token {
+variable ping_username {
+  type = string
+}
+
+variable ping_password {
   type = string
 }
