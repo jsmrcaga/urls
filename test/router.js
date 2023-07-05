@@ -4,13 +4,16 @@ const { expect } = require('chai');
 const { ShortUrl } = require('../src/model');
 
 const router = require('../src/router');
-const logsnag = require('../src/logsnag');
+const ping = require('../src/ping');
 
 describe('Routing', () => {
-
 	before(() => {
-		Sinon.stub(logsnag, 'insight').callsFake(() => Promise.resolve());
+		Sinon.stub(ping, 'perf').callsFake(() => Promise.resolve());
 	});
+
+	const event = {
+		waitUntil: () => Promise.resolve()
+	};
 
 	describe('Short URL retrieval', () => {
 		it('Gets a short URL', done => {
@@ -34,7 +37,7 @@ describe('Routing', () => {
 
 			expect(params).to.be.deep.eql({ tag: '1234' });
 			
-			callback(request, params).then(response => {
+			callback(request, params, null, event).then(response => {
 				expect(response.status).to.be.eql(302);
 				expect(response.headers.get('Location')).to.be.eql('http://google.com');
 
@@ -66,7 +69,7 @@ describe('Routing', () => {
 
 			expect(params).to.be.deep.eql({ tag: '1234' });
 
-			callback(request, params).then(response => {
+			callback(request, params, null, event).then(response => {
 				expect(response.status).to.be.eql(404);
 
 				expect(visited_stub.called).to.be.false;
@@ -97,7 +100,7 @@ describe('Routing', () => {
 			expect(callback).to.be.instanceof(Function);
 			expect(params.tag).to.be.eql('custom_tag');
 
-			const response = callback(request, params);
+			const response = callback(request, params, null, event);
 			expect(response.status).to.be.eql(401);
 		});
 
@@ -120,7 +123,7 @@ describe('Routing', () => {
 			expect(callback).to.be.instanceof(Function);
 			expect(params.tag).to.be.eql('custom_tag');
 
-			callback(request, params).then(response => {
+			callback(request, params, null, event).then(response => {
 				expect(stub.calledOnce).to.be.true;
 				const { firstCall } = stub;
 				// Sinon returns true for first arg even if there are others

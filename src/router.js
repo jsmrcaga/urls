@@ -2,7 +2,7 @@ const { ShortUrl, Pixel } = require('./model');
 const auth = require('./auth');
 const { Router } = require('@control/cloudflare-workers-router');
 
-const logsnag = require('./logsnag');
+const ping = require('./ping');
 
 const router = new Router();
 
@@ -20,7 +20,7 @@ router.post('/:tag', auth((request, { tag }) => {
 	});
 }));
 
-router.get('/:tag', (request, { tag }) => {
+router.get('/:tag', (request, { tag }, preprocessed, event) => {
 	// Get short url
 	const start = Date.now();
 	let get_duration;
@@ -34,33 +34,18 @@ router.get('/:tag', (request, { tag }) => {
 		}
 
 		short_url.visited(Object.fromEntries(request.headers.entries()));
-		return short_url.save();
 
-	}).then(short_url => {
-		total_duration = Date.now() - start;
+		// Do not will worker but execute asynchornously
+		event?.waitUntil?.(short_url.save());
 
-		// Requests _might not_ leave if for some reason
-		// worker is killed before they are launched
+		// Perform real async performance request
+		const perf_request = ping.perf({
+			id: 'urls-kv-read',
+			name: 'urls: KV read',
+			value: get_duration,
+		});
 
-		// 20% of requests
-		const should_report = Math.random() < 0.2;
-		if(should_report) {
-			logsnag.insight({
-				title: 'URL Get duration',
-				value: get_duration,
-				icon: get_duration < 1000 ? '🏎️' : '🐢'
-			});
-
-			logsnag.insight({
-				title: 'URL Get + Save duration',
-				value: total_duration,
-				icon: total_duration < 1000 ? '🏎️' : '🐢'
-			});
-		}
-
-		if(short_url instanceof Response) {
-			return short_url;
-		}
+		event?.waitUntil?.(perf_request);
 
 		return new Response(null, {
 			status: 302,
