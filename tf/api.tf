@@ -1,6 +1,7 @@
 resource cloudflare_worker_script "url_shortener" {
   name = "urls"
   content = file("../index.js")
+  module = false
 
   kv_namespace_binding {
     name = "DATABASE"
@@ -20,6 +21,11 @@ resource cloudflare_worker_script "url_shortener" {
   secret_text_binding {
     name = "PING_PASSWORD"
     text = var.ping_password
+  }
+
+  secret_text_binding {
+    name = "PING_ENDPOINT"
+    text = var.ping_endpoint
   }
 
   lifecycle {
