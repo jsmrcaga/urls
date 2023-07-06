@@ -27,6 +27,15 @@ router.get('/:tag', (request, { tag }, preprocessed, event) => {
 	return ShortUrl.get(tag).then(short_url => {
 		get_duration = Date.now() - start;
 
+		// Perform real async performance request
+		const perf_request = ping.perf({
+			id: 'urls-kv-read',
+			name: 'urls: KV read',
+			value: get_duration,
+		});
+
+		event.waitUntil(perf_request);
+
 		if(short_url === null) {
 			// Short tag does not exist, so we simulate the response
 			return new Response(null, { status: 404 });
@@ -36,15 +45,6 @@ router.get('/:tag', (request, { tag }, preprocessed, event) => {
 
 		// Do not will worker but execute asynchornously
 		event.waitUntil(short_url.save());
-
-		// Perform real async performance request
-		const perf_request = ping.perf({
-			id: 'urls-kv-read',
-			name: 'urls: KV read',
-			value: get_duration,
-		});
-
-		event.waitUntil(perf_request);
 
 		return new Response(null, {
 			status: 302,
