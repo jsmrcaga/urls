@@ -7,7 +7,7 @@ module.exports = (callback) => {
 		const token = request.headers.get('Authorization').replace(/^Bearer/gi, '').trim();
 
 		// Auth token is bound globally via environment
-		if(token !== AUTH_TOKEN) {
+		if(token !== globalThis.AUTH_TOKEN) {
 			return new Response(null, { status: 403 });
 		}
 

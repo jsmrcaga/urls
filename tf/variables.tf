@@ -25,3 +25,7 @@ variable ping_username {
 variable ping_password {
   type = string
 }
+
+variable ping_endpoint {
+  type = string
+}

@@ -1,9 +1,8 @@
-
 class Ping {
 	perf({ id, name, value, icon }) {
-		const auth = btoa(`${PING_USERNAME}:${PING_PASSWORD}`);
+		const auth = btoa(`${globalThis.PING_USERNAME}:${globalThis.PING_PASSWORD}`);
 
-		return fetch('https://api-status.jocolina.com/performance', {
+		return fetch(globalThis.PING_ENDPOINT, {
 			method: 'POST',
 			body: JSON.stringify([{
 				id,

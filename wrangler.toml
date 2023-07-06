@@ -1,14 +1,26 @@
 compatibility_date = "2022-02-26"
 
 name = "urls"
-type = "javascript"
+module = false
 
 workers_dev = false
 
 routes = ["l.jocolina.com/*"]
 
-main = "./index.js"
+main = "./app.js"
 
 [[kv_namespaces]]
 binding = "DATABASE"
 id = "f6428b8357dd4918b3b0faa1eb48052c"
+
+[env.dev]
+[env.dev.vars]
+PING_USERNAME = "test"
+PING_PASSWORD = "1234"
+PING_ENDPOINT = "http://localhost:8787/performance"
+AUTH_TOKEN = 'auth-token'
+
+[[env.dev.kv_namespaces]]
+binding = "DATABASE"
+id = "f6428b8357dd4918b3b0faa1eb48052c"
+preview_id = "98d66cee3cd9418098cbfeb4d3f8cd68"

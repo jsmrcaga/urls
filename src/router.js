@@ -24,7 +24,6 @@ router.get('/:tag', (request, { tag }, preprocessed, event) => {
 	// Get short url
 	const start = Date.now();
 	let get_duration;
-	let total_duration;
 	return ShortUrl.get(tag).then(short_url => {
 		get_duration = Date.now() - start;
 
@@ -36,7 +35,7 @@ router.get('/:tag', (request, { tag }, preprocessed, event) => {
 		short_url.visited(Object.fromEntries(request.headers.entries()));
 
 		// Do not will worker but execute asynchornously
-		event?.waitUntil?.(short_url.save());
+		event.waitUntil(short_url.save());
 
 		// Perform real async performance request
 		const perf_request = ping.perf({
@@ -45,7 +44,7 @@ router.get('/:tag', (request, { tag }, preprocessed, event) => {
 			value: get_duration,
 		});
 
-		event?.waitUntil?.(perf_request);
+		event.waitUntil(perf_request);
 
 		return new Response(null, {
 			status: 302,

@@ -32,7 +32,6 @@ jobs:
       - uses: actions/checkout@master
       - run: npm i -g wrangler
       - run: npm i
-      - run: npm run build
 
       - run: wrangler publish -c ./wrangler.toml
         env:
