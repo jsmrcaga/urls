@@ -15,7 +15,6 @@ terraform {
 provider "cloudflare" {
   email = var.cloudflare.email
   api_key = var.cloudflare.api_key
-  account_id = var.cloudflare.account_id
 }
 
 provider "github" {

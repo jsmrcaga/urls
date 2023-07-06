@@ -1,6 +1,8 @@
 resource cloudflare_worker_script "url_shortener" {
   name = "urls"
   content = file("../index.js")
+  account_id = var.cloudflare.account_id
+
   module = false
 
   kv_namespace_binding {
@@ -37,6 +39,8 @@ resource cloudflare_worker_script "url_shortener" {
 
 resource cloudflare_workers_kv_namespace "url_database" {
   title = "URL Shortener Database"
+
+  account_id = var.cloudflare.account_id
 }
 
 resource cloudflare_worker_route "url_shortener_routes" {
