@@ -1,8 +1,13 @@
 class Ping {
 	perf({ id, name, value, icon }) {
+		if(!globalThis.performance_logger) {
+			return Promise.reject(new Error('No service binding for perf worker'));
+		}
+
 		const auth = btoa(`${globalThis.PING_USERNAME}:${globalThis.PING_PASSWORD}`);
 
-		return fetch(globalThis.PING_ENDPOINT, {
+		// Small vendor lock-in
+		return globalThis.performance_logger.fetch(globalThis.PING_ENDPOINT, {
 			method: 'POST',
 			body: JSON.stringify([{
 				id,
