@@ -30,6 +30,11 @@ resource cloudflare_worker_script "url_shortener" {
     text = var.ping_endpoint
   }
 
+  service_binding {
+    name = "performance_logger"
+    service = "ping_api"
+  }
+
   lifecycle {
     ignore_changes = [
       content
