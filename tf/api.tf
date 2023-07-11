@@ -1,68 +1,42 @@
-resource cloudflare_worker_script "url_shortener" {
-  name = "urls"
-  content = file("../index.js")
-  account_id = var.cloudflare.account_id
+module api {
+  source = "git@github.com:jsmrcaga/terraform-modules//cloudflare-worker?ref=v0.1.6"
 
-  module = false
-
-  kv_namespace_binding {
-    name = "DATABASE"
-    namespace_id = cloudflare_workers_kv_namespace.url_database.id
+  cloudflare = {
+    api_token = var.cloudflare.api_token
+    default_zone_id = var.cloudflare.zone_id
+    default_account_id = var.cloudflare.account_id
   }
 
-  secret_text_binding {
-    name = "AUTH_TOKEN"
-    text = var.worker_auth_token
+  script = {
+    name = "urls"
+    content = file("../index.js")
+
+    secrets = {
+      AUTH_TOKEN = var.worker_auth_token
+      PING_USERNAME = var.ping_username
+      PING_PASSWORD = var.ping_password
+      PING_ENDPOINT = var.ping_endpoint
+    }
+
+    service_bindings = [{
+      name = "performance_logger"
+      service = "ping_api"
+      environment = "production"
+    }]
   }
 
-  secret_text_binding {
-    name = "PING_USERNAME"
-    text = var.ping_username
-  }
+  kv_namespaces = [{
+    title = "URL Shortener Database"
+    binding = "DATABASE"
+  }]
 
-  secret_text_binding {
-    name = "PING_PASSWORD"
-    text = var.ping_password
-  }
+  routes = [{
+    pattern = "l.jocolina.com/*"
+  }]
 
-  secret_text_binding {
-    name = "PING_ENDPOINT"
-    text = var.ping_endpoint
-  }
-
-  service_binding {
-    name = "performance_logger"
-    service = "ping_api"
-  }
-
-  lifecycle {
-    ignore_changes = [
-      content
-    ]
-  }
-}
-
-resource cloudflare_workers_kv_namespace "url_database" {
-  title = "URL Shortener Database"
-
-  account_id = var.cloudflare.account_id
-}
-
-resource cloudflare_worker_route "url_shortener_routes" {
-  zone_id = var.cloudflare.zone_id
-  pattern = "l.jocolina.com/*"
-  script_name = cloudflare_worker_script.url_shortener.name
-}
-
-
-# DNS record
-resource cloudflare_record "l_jocolina" {
-  zone_id = var.cloudflare.zone_id
-
-  name = "l"
-  type = "CNAME"
-  # was "@" but cloudflare translates to top level domain
-  value = "jocolina.com"
-
-  proxied = true
+  dns_records = [{
+    name = "l"
+    type = "CNAME"
+    value = "jocolina.com"
+  }]
 }
