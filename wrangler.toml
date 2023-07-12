@@ -13,10 +13,9 @@ main = "./app.js"
 binding = "DATABASE"
 id = "f6428b8357dd4918b3b0faa1eb48052c"
 
-services = [
-	{ binding = "performance_logger", service = "ping_api" }
-]
-
+[[services]]
+binding = "performance_logger"
+service = "ping_api"
 
 [env.dev]
 [env.dev.vars]
